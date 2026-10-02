@@ -10,12 +10,12 @@ jobs:
           sudo apt install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip python3 file
       - name: Build Firmware Image
         run: |
-          wget https://archive.openwrt.org/releases/18.06.9/targets/ar71xx/generic/openwrt-imagebuilder-18.06.9-ar71xx-generic.Linux-x86_64.tar.xz
-          tar -xf openwrt-imagebuilder-18.06.9-ar71xx-generic.Linux-x86_64.tar.xz
-          cd openwrt-imagebuilder-18.06.9-ar71xx-generic.Linux-x86_64
-          make image PROFILE=TLWA850RE PACKAGES="-wpad-mini -wpad-basic wpad-wolfssl luci -ppp -ppp-mod-pppoe -kmod-ppp -kmod-pppoe -ip6tables -odhcp6c -kmod-ipv6 -kmod-ip6tables"
+          wget https://archive.openwrt.org/releases/18.06.9/targets/ar71xx/tiny/openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64.tar.xz
+          tar -xf openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64.tar.xz
+          cd openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64
+          make image PROFILE=tl-wa850re-v1 PACKAGES="-wpad-mini -wpad-basic wpad-wolfssl luci -ppp -ppp-mod-pppoe -kmod-ppp -kmod-pppoe -ip6tables -odhcp6c -kmod-ipv6 -kmod-ip6tables"
       - name: Upload Firmware
         uses: actions/upload-artifact@v4
         with:
           name: eduroam-firmware
-          path: openwrt-imagebuilder-18.06.9-ar71xx-generic.Linux-x86_64/bin/targets/ar71xx/generic/*sysupgrade.bin
+          path: openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64/bin/targets/ar71xx/tiny/*sysupgrade.bin
