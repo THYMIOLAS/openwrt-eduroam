@@ -1,23 +1,22 @@
-name: Build Firmware Container
+name: Build Firmware Final
 on: workflow_dispatch
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container: ubuntu:18.04
+    runs-on: ubuntu-22.04
     steps:
-      - name: Install Native Legacy Dependencies
+      - name: Build inside Ubuntu 18.04 bubble
         run: |
-          apt-get update
-          apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip file python
-      - name: Build Firmware
-        run: |
-          wget https://archive.openwrt.org/releases/18.06.9/targets/ar71xx/tiny/openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64.tar.xz
-          tar -xf openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64.tar.xz
-          cd openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64
-          make image PROFILE=tl-wa850re-v1 PACKAGES="-wpad-mini -wpad-basic wpad-wolfssl -luci -ppp -ppp-mod-pppoe -kmod-ppp -kmod-pppoe -ip6tables -odhcp6c -kmod-ipv6 -kmod-ip6tables"
+          docker run --rm -v ${{ github.workspace }}:/workspace ubuntu:18.04 bash -c "
+          apt-get update &&
+          apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip file python &&
+          cd /workspace &&
+          wget https://archive.openwrt.org/releases/18.06.9/targets/ar71xx/tiny/openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64.tar.xz &&
+          tar -xf openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64.tar.xz &&
+          cd openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64 &&
+          make image PROFILE=tl-wa850re-v1 PACKAGES=\"-wpad-mini -wpad-basic wpad-wolfssl -luci -ppp -ppp-mod-pppoe -kmod-ppp -kmod-pppoe -ip6tables -odhcp6c -kmod-ipv6 -kmod-ip6tables\"
+          "
       - name: Upload Artifacts
-        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: eduroam-firmware-guaranteed
+          name: eduroam-firmware-done
           path: openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64/bin/targets/ar71xx/tiny/*sysupgrade.bin
