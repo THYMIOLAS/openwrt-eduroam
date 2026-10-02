@@ -4,8 +4,13 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - run: sudo apt update && sudo apt install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip python3 file gcc g++ python2 python-is-python2
-      - run: |
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip file gcc g++ python2 python3
+          sudo ln -sf /usr/bin/python2 /usr/bin/python
+      - name: Build Firmware
+        run: |
           wget https://archive.openwrt.org/releases/18.06.9/targets/ar71xx/tiny/openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64.tar.xz
           tar -xf openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64.tar.xz
           cd openwrt-imagebuilder-18.06.9-ar71xx-tiny.Linux-x86_64
@@ -15,7 +20,8 @@ jobs:
           echo "Auto-detected Profile: $MY_PROFILE" > ../build_log.txt
           
           make image PROFILE=$MY_PROFILE PACKAGES="-wpad-mini -wpad-basic wpad-wolfssl -luci -ppp -ppp-mod-pppoe -kmod-ppp -kmod-pppoe -ip6tables -odhcp6c -kmod-ipv6 -kmod-ip6tables" >> ../build_log.txt 2>&1
-      - if: always()
+      - name: Upload Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Firmware-and-Logs
